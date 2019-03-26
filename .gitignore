@@ -1,0 +1,7 @@
+﻿################################################################################
+# Ten plik .gitignore został utworzony automatycznie przez Microsoft(R) Visual Studio.
+################################################################################
+
+/task2/.vs/task2
+/task2/task2/bin/Debug/netcoreapp2.1
+/task2/task2/obj
