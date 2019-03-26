@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using task2.Models.Services.Contracts;
+using task2.Models.Services.Implementations;
 
 namespace task2
 {
@@ -33,6 +35,8 @@ namespace task2
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddScoped<IEventGetter,DummyEventGetter>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
