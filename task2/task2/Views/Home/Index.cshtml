@@ -6,7 +6,11 @@
 
 @foreach (var entity in Model.Entities)
 {
-    <div>
-        nothing yet
+    <div class="card w-100">
+        <div class="card-body">
+            <h5 class="card-title">@entity.Category/@entity.SubCategory"</h5>
+            <p class="card-text">@entity.Street2 @entity.District @entity.City</p>
+            <a href="#" class="btn btn-primary">Button</a>
+        </div>
     </div>
 }
