@@ -28,5 +28,7 @@ namespace task2.Models.ModelEntites
         public DateTime createDate { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public EventType NotificationType { get; set; }
+        [JsonProperty("event")]
+        public string EventDescription { get; set; }
     }
 }
