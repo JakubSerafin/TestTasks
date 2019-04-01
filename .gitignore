@@ -5,3 +5,8 @@
 /task2/.vs/task2
 /task2/task2/bin/Debug/netcoreapp2.1
 /task2/task2/obj
+/task2/test2.tests/bin/Debug/netcoreapp2.1
+/task2/test2.tests/obj/Debug/netcoreapp2.1
+/task2/test2.tests/obj
+**/bin/**
+**/obj/**

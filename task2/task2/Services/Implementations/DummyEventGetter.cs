@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -10,6 +11,36 @@ using task2.Models.Services.Contracts;
 
 namespace task2.Models.Services.Implementations
 {
+
+    public class EventsGetterBacgroundService
+    {
+        private readonly Action _actionToCall;
+        private readonly IServiceBlocker _blocker;
+        private CancellationToken _token;
+
+
+        public EventsGetterBacgroundService(Action action, CancellationToken token, IServiceBlocker blocker = null)
+        {
+            _actionToCall = action;
+            _token = token;
+            _blocker = blocker;
+
+        }
+
+        public async Task Run()
+        {
+            await Task.Run(() =>
+            {
+                while (!_token.IsCancellationRequested)
+                {
+                    if (_blocker?.CanProcess() ?? true)
+                    {
+                        _actionToCall.Invoke();
+                    }
+                }
+            });
+        }
+    }
 
     public class UnixEpochWithMilisecondsConventer : Newtonsoft.Json.JsonConverter
     {
@@ -30,6 +61,8 @@ namespace task2.Models.Services.Implementations
         }
     }
 
+
+    //public class RealEventGetter: 
 
     public class DummyEventGetter : IEventGetter
     {
