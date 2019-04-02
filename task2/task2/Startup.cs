@@ -37,6 +37,7 @@ namespace task2
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddScoped<IEventGetter,DummyEventGetter>();
+            services.AddSingleton<ISyncDate, SimpleSyncDate>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

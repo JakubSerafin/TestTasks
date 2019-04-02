@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using task2.Models.ModelEntites;
@@ -11,6 +12,59 @@ using task2.Models.Services.Contracts;
 
 namespace task2.Models.Services.Implementations
 {
+
+
+    public class SimpleSyncDate : ISyncDate
+    {
+        public DateTime? SyncDate
+        {
+            get;
+            set;
+        }
+    }
+    public class ApiEventLocalManager: IEventGetter, IPagedEventGeter
+    {
+        private IAsyncEventGetter emptyCollectionReciever;
+        private IAsyncEventGetter filledCollectionReciever;
+        private ISyncDate lastSyncDateSeter;
+        private List<EventObject> _events = new List<EventObject>();
+
+        public ApiEventLocalManager(IAsyncEventGetter emptyCollectionReciever, IAsyncEventGetter filledCollectionReciever, ISyncDate lastSyncDateSeter)
+        {
+            this.emptyCollectionReciever = emptyCollectionReciever;
+            this.filledCollectionReciever = filledCollectionReciever;
+            this.lastSyncDateSeter = lastSyncDateSeter;
+        }
+
+        public IList<EventObject> GetEventNotifications()
+        {
+            return _events;
+        }
+
+
+       
+
+        public async Task GetFromRemote()
+        {
+            IList<EventObject> events;
+            if (lastSyncDateSeter.SyncDate == null)
+            {
+                events = await emptyCollectionReciever.GetEventNotifications();
+            }
+            else
+            {
+               events = await filledCollectionReciever.GetEventNotifications();
+            }
+
+            _events.AddRange(events);
+            lastSyncDateSeter.SyncDate = DateTime.Now;
+        }
+
+        public IList<EventObject> GetPage(int pageNum, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     public class EventsGetterBacgroundService
     {
@@ -66,7 +120,7 @@ namespace task2.Models.Services.Implementations
 
     public class DummyEventGetter : IEventGetter
     {
-        public ICollection<EventObject> GetEventNotifications()
+        public IList<EventObject> GetEventNotifications()
         {
             return JsonConvert.DeserializeObject<EventObject[]>(_json,new UnixEpochWithMilisecondsConventer()).ToList();
         }

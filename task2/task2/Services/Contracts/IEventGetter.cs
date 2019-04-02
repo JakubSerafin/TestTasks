@@ -6,18 +6,31 @@ using task2.Models.ModelEntites;
 
 namespace task2.Models.Services.Contracts
 {
+
+
+
+    public interface ISyncDate
+    {
+        DateTime? SyncDate { get; set; }
+    }
+
     public interface IServiceBlocker
     {
         bool CanProcess();
     }
 
+    public interface IAsyncEventGetter
+    {
+        Task<IList<EventObject>>  GetEventNotifications();
+    }
+
     public interface IEventGetter
     {
-        ICollection<EventObject> GetEventNotifications();
+        IList<EventObject> GetEventNotifications();
     }
 
     public interface IPagedEventGeter
     {
-        ICollection<EventObject> GetPage(int pageNum, int pageSize);
+        IList<EventObject> GetPage(int pageNum, int pageSize);
     }
 }
