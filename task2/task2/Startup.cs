@@ -42,6 +42,9 @@ namespace task2
             services.AddSingleton<ISyncDate, SimpleSyncDate>();
             services.AddScoped<IEventGetter, ApiEventLocalManager>();
             services.AddScoped<IAsyncEventGetter, BaseApiEventGetter>(sp=>new BaseApiEventGetter(_secretApiKey));
+            services.AddSingleton<IServiceBlocker, TimeServiceBlocker>();
+
+            services.AddHostedService<EventsGetterBacgroundServiceWrapper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

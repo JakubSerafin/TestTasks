@@ -21,7 +21,7 @@ namespace test2.tests
 
         private EventsGetterBacgroundService BuildEventsGetterBacgroundService(Action action, IServiceBlocker blocker = null)
         {
-            return new EventsGetterBacgroundService(action,_cancelationTokenSource.Token, blocker);
+            return new EventsGetterBacgroundService(action, blocker);
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace test2.tests
             Action action= () =>{actionWasCalled = true;};
 
             var getter = BuildEventsGetterBacgroundService(action);
-            var task = getter.Run();
+            var task = getter.Run(_cancelationTokenSource.Token);
             _cancelationTokenSource.Cancel();
             task.Wait();
 
@@ -45,7 +45,7 @@ namespace test2.tests
 
             var getter = BuildEventsGetterBacgroundService(() => { });
 
-            var task = getter.Run();
+            var task = getter.Run(_cancelationTokenSource.Token);
                 _cancelationTokenSource.Cancel();
                 task.Wait(100);
                 Assert.True(task.IsCompletedSuccessfully);
@@ -62,11 +62,11 @@ namespace test2.tests
             bool actionWasCalled = false;
             Action action = () => { actionWasCalled = true; };
 
-            var getter = BuildEventsGetterBacgroundService(action,_standardBlocker);
+            var getter = BuildEventsGetterBacgroundService(action);
 
             _standardBlocker.CanProcess().Returns(false);
             
-            var task = getter.Run();
+            var task = getter.Run(_cancelationTokenSource.Token);
             Assert.False(actionWasCalled);
             _standardBlocker.CanProcess().Returns(true);
             _cancelationTokenSource.Cancel();

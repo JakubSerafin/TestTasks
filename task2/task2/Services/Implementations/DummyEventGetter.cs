@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -16,163 +11,8 @@ using task2.Models.Services.Contracts;
 namespace task2.Models.Services.Implementations
 {
 
-
-    public class SimpleSyncDate : ISyncDate
-    {
-        public DateTime? SyncDate
-        {
-            get;
-            set;
-        }
-    }
-
-
-    public class BaseApiEventGetter : IAsyncEventGetter
-    {
-        private const string URL = @"https://api.um.warszawa.pl/api/action/";
-        private const string Action = "19115store_getNotifications";
-        private readonly string _secretKey;
-
-        public BaseApiEventGetter(string secretKey)
-        {
-            _secretKey = secretKey;
-        }
-
-        public async Task<IList<EventObject>> GetEventNotifications()
-        {
-             HttpClient httpClient = new HttpClient();
-             httpClient.BaseAddress = new Uri(URL);
-             var queryParams = new Dictionary<string, string>
-             {
-                 {"id", "28dc65ad-fff5-447b-99a3-95b71b4a7d1e"},
-                 {"apiKey", _secretKey}
-             };
-             var request = new HttpRequestMessage(HttpMethod.Get,QueryHelpers.AddQueryString(Action,queryParams));
-
-             var result = await httpClient.SendAsync(request);
-             var content = await result.Content.ReadAsStringAsync();
-
-             var colection = JsonConvert.DeserializeObject<List<EventObject>>(content);
-             return colection;
-        }
-    }
-
-    public class TimePeriodEventGetter : IAsyncEventGetter
-    {
-        public Task<IList<EventObject>> GetEventNotifications()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class ApiEventLocalManager: IEventGetter, IPagedEventGeter
-    {
-        private IAsyncEventGetter emptyCollectionReciever;
-        private IAsyncEventGetter filledCollectionReciever;
-        private ISyncDate lastSyncDateSeter;
-        private List<EventObject> _events = new List<EventObject>();
-
-        public ApiEventLocalManager(IAsyncEventGetter emptyCollectionReciever, IAsyncEventGetter filledCollectionReciever, ISyncDate lastSyncDateSeter)
-        {
-            this.emptyCollectionReciever = emptyCollectionReciever;
-            this.filledCollectionReciever = filledCollectionReciever;
-            this.lastSyncDateSeter = lastSyncDateSeter;
-        }
-
-        public IList<EventObject> GetEventNotifications()
-        {
-            return _events;
-        }
-
-
-       
-
-        public async Task GetFromRemote()
-        {
-            IList<EventObject> events;
-            if (lastSyncDateSeter.SyncDate == null)
-            {
-                events = await emptyCollectionReciever.GetEventNotifications();
-            }
-            else
-            {
-               events = await filledCollectionReciever.GetEventNotifications();
-            }
-
-            _events.AddRange(events);
-            lastSyncDateSeter.SyncDate = DateTime.Now;
-        }
-
-        public IList<EventObject> GetPage(int pageNum, int pageSize)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class EventsGetterBacgroundService
-    {
-        private readonly Action _actionToCall;
-        private readonly IServiceBlocker _blocker;
-        private CancellationToken _token;
-
-
-        public EventsGetterBacgroundService(Action action, CancellationToken token, IServiceBlocker blocker = null)
-        {
-            _actionToCall = action;
-            _token = token;
-            _blocker = blocker;
-
-        }
-
-        public async Task Run()
-        {
-            await Task.Run(() =>
-            {
-                while (!_token.IsCancellationRequested)
-                {
-                    if (_blocker?.CanProcess() ?? true)
-                    {
-                        _actionToCall.Invoke();
-                    }
-                }
-            });
-        }
-    }
-
-    public class UnixEpochWithMilisecondsConventer : Newtonsoft.Json.JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(DateTime);
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            var t = (long)reader.Value;
-            return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(t);
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-
-    //public class RealEventGetter: 
-
     public class DummyEventGetter : IEventGetter
     {
-        public IList<EventObject> GetEventNotifications()
-        {
-            return JsonConvert.DeserializeObject<EventObject[]>(_json,new UnixEpochWithMilisecondsConventer()).ToList();
-        }
-
-        private EventObject FromJson(string json)
-        {
-            return JsonConvert.DeserializeObject<EventObject>(json);
-        }
-
         private string _json = @"                [{
                     ""category"": ""Proces Interwencyjny"",
                     ""city"": ""Warszawa"",
@@ -333,5 +173,15 @@ namespace task2.Models.Services.Implementations
                     ""event"": ""Źle zaparkowane pojazdy"",
                     ""xCoordWGS84"": 21.0603413358519
                 }]";
+
+        public IList<EventObject> GetEventNotifications()
+        {
+            return JsonConvert.DeserializeObject<EventObject[]>(_json, new UnixEpochWithMilisecondsConventer()).ToList();
+        }
+
+        private EventObject FromJson(string json)
+        {
+            return JsonConvert.DeserializeObject<EventObject>(json);
+        }
     }
 }
