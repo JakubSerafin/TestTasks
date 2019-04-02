@@ -19,12 +19,13 @@ namespace task2
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _secretApiKey = configuration["SecretValues:apiKey"];
+            _secretApiKey = configuration["apiKey"];
         }
 
         public IConfiguration Configuration { get; }
 
         private string _secretApiKey;
+        private static ApiEventLocalManager staticApiEventManager;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -39,13 +40,25 @@ namespace task2
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+
+            
             services.AddSingleton<ISyncDate, SimpleSyncDate>();
-            services.AddSingleton<IEventGetter, ApiEventLocalManager>();
-            services.AddSingleton<IActionProvider, ApiEventLocalManager>();
-            services.AddSingleton<IAsyncEventGetter, BaseApiEventGetter>(sp=>new BaseApiEventGetter(_secretApiKey));
+            services.AddSingleton(provider => new ApiCaller(_secretApiKey));
+            services.AddTransient<BaseApiEventGetter>();
+            services.AddTransient<TimePeriodApiEventGetter>();
+
+            services.AddSingleton<IEventGetter>(x=> GetLocalApiManager(x.GetService<BaseApiEventGetter>(),x.GetService<TimePeriodApiEventGetter>(),x.GetService<ISyncDate>()));
+            services.AddSingleton<IActionProvider>(x => GetLocalApiManager(x.GetService<BaseApiEventGetter>(), x.GetService<TimePeriodApiEventGetter>(), x.GetService<ISyncDate>()));
             services.AddSingleton<IServiceBlocker, TimeServiceBlocker>();
 
             services.AddHostedService<EventsGetterBacgroundServiceWrapper>();
+        }
+
+        private ApiEventLocalManager GetLocalApiManager(IAsyncEventGetter asyncEventGetter1, IAsyncEventGetter asyncEventGetter2, ISyncDate syncDate)
+        {
+            if (staticApiEventManager == null)
+                staticApiEventManager = new ApiEventLocalManager(asyncEventGetter1, asyncEventGetter2, syncDate);
+            return staticApiEventManager;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

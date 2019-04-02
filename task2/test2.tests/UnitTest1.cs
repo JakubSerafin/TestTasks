@@ -84,7 +84,7 @@ namespace test2.tests
     }
     internal class MockSyncDate : ISyncDate
     {
-        public DateTime? SyncDate { get; set; }
+        public DateTimeOffset? SyncDate { get; set; }
     }
 
     public class ApiEventLocalManagerTests

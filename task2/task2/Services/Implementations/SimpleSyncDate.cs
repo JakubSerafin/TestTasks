@@ -5,7 +5,7 @@ namespace task2.Models.Services.Implementations
 {
     public class SimpleSyncDate : ISyncDate
     {
-        public DateTime? SyncDate
+        public DateTimeOffset? SyncDate
         {
             get;
             set;

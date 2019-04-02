@@ -31,4 +31,23 @@ namespace task2.Models.ModelEntites
         [JsonProperty("event")]
         public string EventDescription { get; set; }
     }
+
+    public class EventRequestResponse
+    {
+        public EventResultResponse result { get; set; }
+    }
+
+    public class EventResultResponse
+    {
+        public bool success { get; set; }
+        public ResultResponse result { get; set; }
+
+    }
+
+    public class ResultResponse
+    {
+        public List<EventObject> notifications { get; set; }
+        public string responseDesc { get; set; }
+        public string responseCode { get; set; }
+    }
 }

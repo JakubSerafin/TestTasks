@@ -11,7 +11,7 @@ namespace task2.Models.Services.Contracts
 
     public interface ISyncDate
     {
-        DateTime? SyncDate { get; set; }
+        DateTimeOffset? SyncDate { get; set; }
     }
 
     public interface IServiceBlocker
