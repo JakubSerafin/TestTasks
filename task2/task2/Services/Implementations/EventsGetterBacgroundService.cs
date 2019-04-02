@@ -11,13 +11,13 @@ namespace task2.Models.Services.Implementations
 
     public interface IActionProvider
     {
-        void Run();
+        Task Run();
     }
 
     public class EventsGetterBacgroundServiceWrapper : IHostedService
     {
         private IServiceBlocker _blocker;
-        private Action _action;
+        private Func<Task> _action;
         private EventsGetterBacgroundService _backgroundService;
         private Task _backgroundServiceTask;
 
@@ -43,12 +43,12 @@ namespace task2.Models.Services.Implementations
 
     public class EventsGetterBacgroundService
     {
-        private readonly Action _actionToCall;
+        private readonly Func<Task> _actionToCall;
         private readonly IServiceBlocker _blocker;
         private CancellationToken _token;
 
 
-        public EventsGetterBacgroundService(Action action,  IServiceBlocker blocker = null)
+        public EventsGetterBacgroundService(Func<Task> action,  IServiceBlocker blocker = null)
         {
             _actionToCall = action;
 ;
@@ -59,13 +59,13 @@ namespace task2.Models.Services.Implementations
         public async Task Run(CancellationToken token)
         {
             _token = token;
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 while (!_token.IsCancellationRequested)
                 {
                     if (_blocker?.CanProcess() ?? true)
                     {
-                        _actionToCall.Invoke();
+                        await _actionToCall.Invoke();
                     }
                 }
             });

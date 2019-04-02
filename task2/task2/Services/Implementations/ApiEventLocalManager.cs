@@ -6,7 +6,7 @@ using task2.Models.Services.Contracts;
 
 namespace task2.Models.Services.Implementations
 {
-    public class ApiEventLocalManager : IEventGetter, IPagedEventGeter
+    public class ApiEventLocalManager : IEventGetter, IPagedEventGeter, IActionProvider
     {
         private List<EventObject> _events = new List<EventObject>();
         private IAsyncEventGetter emptyCollectionReciever;
@@ -24,10 +24,12 @@ namespace task2.Models.Services.Implementations
             return _events;
         }
 
+        public IList<EventObject> GetPage(int pageNum, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
 
-
-
-        public async Task GetFromRemote()
+        public async Task Run()
         {
             IList<EventObject> events;
             if (lastSyncDateSeter.SyncDate == null)
@@ -41,11 +43,6 @@ namespace task2.Models.Services.Implementations
 
             _events.AddRange(events);
             lastSyncDateSeter.SyncDate = DateTime.Now;
-        }
-
-        public IList<EventObject> GetPage(int pageNum, int pageSize)
-        {
-            throw new NotImplementedException();
         }
     }
 

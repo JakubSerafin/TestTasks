@@ -40,8 +40,9 @@ namespace task2
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSingleton<ISyncDate, SimpleSyncDate>();
-            services.AddScoped<IEventGetter, ApiEventLocalManager>();
-            services.AddScoped<IAsyncEventGetter, BaseApiEventGetter>(sp=>new BaseApiEventGetter(_secretApiKey));
+            services.AddSingleton<IEventGetter, ApiEventLocalManager>();
+            services.AddSingleton<IActionProvider, ApiEventLocalManager>();
+            services.AddSingleton<IAsyncEventGetter, BaseApiEventGetter>(sp=>new BaseApiEventGetter(_secretApiKey));
             services.AddSingleton<IServiceBlocker, TimeServiceBlocker>();
 
             services.AddHostedService<EventsGetterBacgroundServiceWrapper>();

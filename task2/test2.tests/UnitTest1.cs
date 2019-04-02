@@ -19,7 +19,7 @@ namespace test2.tests
         private IServiceBlocker _standardBlocker = Substitute.For<IServiceBlocker>();
 
 
-        private EventsGetterBacgroundService BuildEventsGetterBacgroundService(Action action, IServiceBlocker blocker = null)
+        private EventsGetterBacgroundService BuildEventsGetterBacgroundService(Func<Task> action, IServiceBlocker blocker = null)
         {
             return new EventsGetterBacgroundService(action, blocker);
         }
@@ -28,11 +28,15 @@ namespace test2.tests
         public void Run_IsCallingGetterAfterCalled()
         {
             bool actionWasCalled = false;
-            Action action= () =>{actionWasCalled = true;};
+            Func<Task> action = () =>
+            {
+                actionWasCalled = true;
+                return Task.CompletedTask;
+            };
 
             var getter = BuildEventsGetterBacgroundService(action);
             var task = getter.Run(_cancelationTokenSource.Token);
-            _cancelationTokenSource.Cancel();
+            _cancelationTokenSource.CancelAfter(50); //this is bad, i know. To be replaced with something else. 
             task.Wait();
 
             Assert.True(actionWasCalled);
@@ -43,7 +47,7 @@ namespace test2.tests
         public void Run_StopWhenTokenIsSetToCancelWhileWaitingOnUnlock()
         {
 
-            var getter = BuildEventsGetterBacgroundService(() => { });
+            var getter = BuildEventsGetterBacgroundService(() => Task.CompletedTask);
 
             var task = getter.Run(_cancelationTokenSource.Token);
                 _cancelationTokenSource.Cancel();
@@ -60,7 +64,11 @@ namespace test2.tests
            
 
             bool actionWasCalled = false;
-            Action action = () => { actionWasCalled = true; };
+            Func<Task> action = () =>
+            {
+                actionWasCalled = true;
+                return Task.CompletedTask;
+            };
 
             var getter = BuildEventsGetterBacgroundService(action);
 
@@ -93,7 +101,7 @@ namespace test2.tests
             _dateSync.SyncDate =  null;
 
             var eventsLocalManager = GetApiEventLocalManager();
-            await eventsLocalManager.GetFromRemote();
+            await eventsLocalManager.Run();
             await _emptyCollectionReciever.Received(1).GetEventNotifications();
             await _filledCollectionReciever.Received(0).GetEventNotifications();
         }
@@ -109,7 +117,7 @@ namespace test2.tests
             _dateSync.SyncDate = DateTime.Parse("10.10.2010");
 
             var eventsLocalManager = GetApiEventLocalManager();
-            await eventsLocalManager.GetFromRemote();
+            await eventsLocalManager.Run();
             await _emptyCollectionReciever.Received(0).GetEventNotifications();
             await _filledCollectionReciever.Received(1).GetEventNotifications();
         }
@@ -121,8 +129,8 @@ namespace test2.tests
             _dateSync.SyncDate = null;
 
             var eventsLocalManager = GetApiEventLocalManager();
-            await eventsLocalManager.GetFromRemote();
-            await eventsLocalManager.GetFromRemote();
+            await eventsLocalManager.Run();
+            await eventsLocalManager.Run();
             await _emptyCollectionReciever.Received(1).GetEventNotifications();
             await _filledCollectionReciever.Received(1).GetEventNotifications();
         }
@@ -137,7 +145,7 @@ namespace test2.tests
             _emptyCollectionReciever.GetEventNotifications().Returns(Task.Run(()=>data));
 
             var eventsLocalManager = GetApiEventLocalManager();
-            await eventsLocalManager.GetFromRemote();
+            await eventsLocalManager.Run();
 
             Assert.Equal(data,eventsLocalManager.GetEventNotifications());
         }
@@ -153,8 +161,8 @@ namespace test2.tests
 
 
             var eventsLocalManager = GetApiEventLocalManager();
-            await eventsLocalManager.GetFromRemote(); //initialization
-            await eventsLocalManager.GetFromRemote(); // geting new items 
+            await eventsLocalManager.Run(); //initialization
+            await eventsLocalManager.Run(); // geting new items 
 
             Assert.Collection(eventsLocalManager.GetEventNotifications(),
                 e => Assert.Equal(data[0],e),
