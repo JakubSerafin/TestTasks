@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -22,6 +25,46 @@ namespace task2.Models.Services.Implementations
             set;
         }
     }
+
+
+    public class BaseApiEventGetter : IAsyncEventGetter
+    {
+        private const string URL = @"https://api.um.warszawa.pl/api/action/";
+        private const string Action = "19115store_getNotifications";
+        private readonly string _secretKey;
+
+        public BaseApiEventGetter(string secretKey)
+        {
+            _secretKey = secretKey;
+        }
+
+        public async Task<IList<EventObject>> GetEventNotifications()
+        {
+             HttpClient httpClient = new HttpClient();
+             httpClient.BaseAddress = new Uri(URL);
+             var queryParams = new Dictionary<string, string>
+             {
+                 {"id", "28dc65ad-fff5-447b-99a3-95b71b4a7d1e"},
+                 {"apiKey", _secretKey}
+             };
+             var request = new HttpRequestMessage(HttpMethod.Get,QueryHelpers.AddQueryString(Action,queryParams));
+
+             var result = await httpClient.SendAsync(request);
+             var content = await result.Content.ReadAsStringAsync();
+
+             var colection = JsonConvert.DeserializeObject<List<EventObject>>(content);
+             return colection;
+        }
+    }
+
+    public class TimePeriodEventGetter : IAsyncEventGetter
+    {
+        public Task<IList<EventObject>> GetEventNotifications()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class ApiEventLocalManager: IEventGetter, IPagedEventGeter
     {
         private IAsyncEventGetter emptyCollectionReciever;

@@ -19,9 +19,12 @@ namespace task2
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            _secretApiKey = configuration["SecretValues:apiKey"];
         }
 
         public IConfiguration Configuration { get; }
+
+        private string _secretApiKey;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -36,8 +39,9 @@ namespace task2
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddScoped<IEventGetter,DummyEventGetter>();
             services.AddSingleton<ISyncDate, SimpleSyncDate>();
+            services.AddScoped<IEventGetter, ApiEventLocalManager>();
+            services.AddScoped<IAsyncEventGetter, BaseApiEventGetter>(sp=>new BaseApiEventGetter(_secretApiKey));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

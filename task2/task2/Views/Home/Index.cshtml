@@ -26,14 +26,22 @@
         }
     }
 }
-
-@foreach (var entity in Model.Entities)
+@if (Model.Entities.Count == 0)
 {
-    <div class="card w-100">
-        <div class="card-header @GetCardColor(entity.NotificationType)">@entity.Category/@entity.SubCategory</div>
-        <div class="card-body">
-            <h5 class="card-title"> @entity.EventDescription</h5>
-            <p class="card-text">@entity.Street2 @entity.District @entity.City</p>
+    <H3>Data still not loaded form 19555 api, wait few moments</H3>
+    <span class="pseudospinner">This should be spinner</span>
+
+}
+else
+{
+    foreach (var entity in Model.Entities)
+    {
+        <div class="card w-100">
+            <div class="card-header @GetCardColor(entity.NotificationType)">@entity.Category/@entity.SubCategory</div>
+            <div class="card-body">
+                <h5 class="card-title"> @entity.EventDescription</h5>
+                <p class="card-text">@entity.Street2 @entity.District @entity.City</p>
+            </div>
         </div>
-    </div>
+    }
 }

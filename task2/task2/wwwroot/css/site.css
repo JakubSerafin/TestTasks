@@ -35,3 +35,19 @@ body {
         display: none;
     }
 }
+
+
+
+
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.pseudospinner {
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-name: spin;
+    display: inline-block;
+}
