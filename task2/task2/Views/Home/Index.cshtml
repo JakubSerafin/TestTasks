@@ -14,11 +14,19 @@
 
 <script src="~/js/site.min.js" asp-append-version="true"></script>
 <script>
-    setInterval(() => {
+    var updater = setInterval(function(){
             $.get("home/GetCards",
-                function(data) {
-                    $("#cardsPanel").html(data);
+                function (data) {
+                    if (data !== undefined) {
+                        $("#cardsPanel").html(data);
+                        clearInterval(updater);
+                        updater = setInterval(() => $.get("home/GetNewCards?dateTime=" + Date.now(),
+                            function(data) {
+                                $("#cardsPanel").prepend(data);
+                            }),
+                            5000);
+                    }
                 });
         },
-        4000);
+        5000);
 </script>

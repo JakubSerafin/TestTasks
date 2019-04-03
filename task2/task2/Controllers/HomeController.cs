@@ -45,6 +45,21 @@ namespace task2.Controllers
             }
         }
 
-   
+        public IActionResult GetNewCards(long dateTime)
+        {
+            var notifications =  _eventGetter.GetEventNotifications();
+            var entities = notifications.Where(e=>e.createDate> DateTimeOffset.FromUnixTimeMilliseconds(dateTime)).ToList();
+            if (entities.Any())
+            {
+                return PartialView("CardsView", entities);
+
+            }
+            else
+            {
+                return NoContent();
+            }
+        }
+
+
     }
 }
