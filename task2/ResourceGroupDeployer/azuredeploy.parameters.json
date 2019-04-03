@@ -9,7 +9,7 @@
       "value": "zbyszek"
     },
     "environment": {
-      "value": "dev"
+      "value": "prod"
     }
   }
 }

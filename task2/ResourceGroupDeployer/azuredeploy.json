@@ -82,7 +82,13 @@
             {
               "name": "WarsawApiUrl",
               "value": "[parameters('WarsawApiUrl')]"
+            },
+            {
+              "name": "ENVIRONMENT_TYPE",
+              "value": "[parameters('environment')]"
             }
+            
+
           ]
         }
       }
