@@ -20,13 +20,29 @@ namespace task2.Controllers
 
         public IActionResult Index()
         {
-            var notifications = _eventGetter.GetEventNotifications();
+            
             var model = new IndexModel
             {
-                Entities = notifications.ToList()
+                //Entities = notifications.ToList()
             };
 
             return View(model);
+        }
+
+
+        public IActionResult GetCards()
+        {
+            var notifications = _eventGetter.GetEventNotifications();
+            var entities = notifications.ToList();
+            if (entities.Any())
+            {
+                return PartialView("CardsView", entities);
+
+            }
+            else
+            {
+                return NoContent();
+            }
         }
 
    
