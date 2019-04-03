@@ -93,8 +93,8 @@ namespace task2.Models.Services.Implementations
         public async Task<IList<EventObject>> GetEventNotifications()
         {
             var response = await caller.Call<EventRequestResponse>(Action);
-           
-            return response.result.success? response.result.result.notifications: new List<EventObject>();
+            var isSuccess = response.result?.success; 
+            return (isSuccess.HasValue && isSuccess.Value)? response.result.result.notifications: new List<EventObject>();
         }
     }
 
