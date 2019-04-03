@@ -3,11 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
 
-    "resource": {
-      "type": "string"
-    },
-
-    "resourceGroup": {
+    "resourceName": {
       "type": "string"
     },
 
@@ -43,44 +39,52 @@
     "WarsawApiUrl": {
       "type": "string",
       "defaultValue": "https://api.um.warszawa.pl/api/action/"
-    },
-
+    }
   },
+
   "variables": {
-    "farmName": "[concat('AppPlan-',parameters('resource'))]",
+    "farmName": "[concat('AppPlan-',parameters('resourceName'))]"
   },
   "resources": [
     {
-      "name": "[variables('farmName')]",
-      "type": "Microsoft.Web/serverfarms",
-      "resourceGroup": "[parameters('resourceGroup')]",
-      "location": "[resourceGroup().location]",
       "apiVersion": "2015-08-01",
+      "dependsOn": [],
+      "location": "[resourceGroup().location]",
+      "name": "[variables('farmName')]",
       "sku": {
         "name": "[parameters('webAppPlan')]"
       },
-      "dependsOn": [],
       "tags": {
         "displayName": "app service plan"
-      }
+      },
+      "type": "Microsoft.Web/serverfarms"
     },
 
     {
-      "name": "[parameters('resource')]",
+      "apiVersion": "2018-02-01",
+      "name": "[parameters('resourceName')]",
       "type": "Microsoft.Web/sites",
-      "resourceGroup": "[parameters('resourceGroup')]",
+
       "location": "[resourceGroup().location]",
-      "apiVersion": "2015-08-01",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('farmName'))]"
       ],
       "tags": {
         "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('farmName')))]": "Resource",
-        "displayName": "web app"
+        "displayName": "web app",
+        "ServiceOwner": "[parameters('ServiceOwner')]"
+
       },
       "properties": {
-        "name": "[parameters('resource')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('farmName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('farmName'))]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "WarsawApiUrl",
+              "value": "[parameters('WarsawApiUrl')]"
+            }
+          ]
+        }
       }
     }
   ],
