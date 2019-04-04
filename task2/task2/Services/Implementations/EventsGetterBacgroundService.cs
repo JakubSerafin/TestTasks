@@ -63,7 +63,7 @@ namespace task2.Models.Services.Implementations
             {
                 while (!_token.IsCancellationRequested)
                 {
-                    if (_blocker?.CanProcess() ?? true)
+                    if (_blocker?.WaitCanProcess()??true)
                     {
                         await _actionToCall.Invoke();
                     }

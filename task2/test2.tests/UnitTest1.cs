@@ -72,11 +72,11 @@ namespace test2.tests
 
             var getter = BuildEventsGetterBacgroundService(action);
 
-            _standardBlocker.CanProcess().Returns(false);
+            _standardBlocker.WaitCanProcess().Returns(false);
             
             var task = getter.Run(_cancelationTokenSource.Token);
             Assert.False(actionWasCalled);
-            _standardBlocker.CanProcess().Returns(true);
+            _standardBlocker.WaitCanProcess().Returns(true);
             _cancelationTokenSource.Cancel();
             task.Wait();
             Assert.True(actionWasCalled);

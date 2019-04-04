@@ -2,6 +2,6 @@
 {
     public interface IServiceBlocker
     {
-        bool CanProcess();
+        bool WaitCanProcess();
     }
 }

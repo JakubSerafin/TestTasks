@@ -5,20 +5,20 @@ namespace task2.Models.Services.Implementations
 {
     public class TimeServiceBlocker : IServiceBlocker
     {
-        private bool _canProcess = false;
+        private AutoResetEvent _canProcess = new AutoResetEvent(false);
         public TimeServiceBlocker()
         {
-            Timer timer = new Timer((tim)=>_canProcess=true,null,0,30000);
+
+            Timer timer = new Timer((tim)=>_canProcess.Set(),null,0,30000);
+            
         }
 
-        public bool CanProcess()
+        bool IServiceBlocker.WaitCanProcess()
         {
-            if (_canProcess == true)
+            if (_canProcess.WaitOne())
             {
-                _canProcess = false;
                 return true;
             }
-
             return false;
         }
     }
