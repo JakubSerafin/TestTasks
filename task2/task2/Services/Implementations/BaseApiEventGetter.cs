@@ -12,11 +12,12 @@ namespace task2.Models.Services.Implementations
 {
     public class ApiCaller
     {
-        private const string URL = @"https://api.um.warszawa.pl/api/action/";
+        private readonly string _url = @"https://api.um.warszawa.pl/api/action/";
         private readonly string _secretKey;
 
-        public ApiCaller(string secretKey)
+        public ApiCaller(string secretKey, string apiUrl)
         {
+            _url = apiUrl;
             _secretKey = secretKey;
         }
 
@@ -43,7 +44,7 @@ namespace task2.Models.Services.Implementations
         {
             var query = BuildQuery(action, additionalParams);
             HttpClient httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(URL);
+            httpClient.BaseAddress = new Uri(_url);
 
             var request = new HttpRequestMessage(HttpMethod.Get, BuildQuery(action,additionalParams));
 

@@ -15,11 +15,13 @@ namespace task2
         {
             Configuration = configuration;
             _secretApiKey = configuration["apiKey"];
+            _apiUrl = configuration["WarsawApiUrl"];
         }
 
         public IConfiguration Configuration { get; }
 
         private string _secretApiKey;
+        private string _apiUrl;
         private static ApiEventLocalManager staticApiEventManager;
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -38,7 +40,7 @@ namespace task2
 
             
             services.AddSingleton<ISyncDate, SimpleSyncDate>();
-            services.AddSingleton(provider => new ApiCaller(_secretApiKey));
+            services.AddSingleton(provider => new ApiCaller(_secretApiKey,_apiUrl));
             services.AddTransient<BaseApiEventGetter>();
             services.AddTransient<TimePeriodApiEventGetter>();
 

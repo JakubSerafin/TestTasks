@@ -10,6 +10,12 @@
     },
     "environment": {
       "value": "prod"
+    },
+    "app deployPackageFileName": {
+      "value": "package.zip"
+    },
+    "app deployPackageFolder": {
+      "value": "task2"
     }
   }
 }

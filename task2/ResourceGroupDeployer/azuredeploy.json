@@ -39,11 +39,31 @@
     "WarsawApiUrl": {
       "type": "string",
       "defaultValue": "https://api.um.warszawa.pl/api/action/"
+    },
+    "_artifactsLocation": {
+      "type": "string"
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring"
+    },
+    "app deployPackageFolder": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "WebDeploy package location. This path is relative to the _artifactsLocation parameter"
+      }
+    },
+    "app deployPackageFileName": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "Name of the webdeploy package"
+      }
     }
   },
 
   "variables": {
-    "farmName": "[concat('AppPlan-',parameters('resourceName'))]"
+    "farmName": "[concat('AppPlan-',parameters('resourceName'))]",
   },
   "resources": [
     {
@@ -91,7 +111,29 @@
 
           ]
         }
-      }
+      },
+      "resources": [
+        {
+          "name": "MSDeploy",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('resourceName'))]"
+          ],
+          "tags": {
+            "displayName": "app deploy"
+          },
+          "properties": {
+            "packageUri": "[concat(parameters('_artifactsLocation'), '/', parameters('app deployPackageFolder'), '/', parameters('app deployPackageFileName'), parameters('_artifactsLocationSasToken'))]",
+            "dbType": "None",
+            "connectionString": "",
+            "setParameters": {
+              "IIS Web Application Name": "[parameters('resourceName')]"
+            }
+          }
+        }
+      ]
     }
   ],
   "outputs": {}

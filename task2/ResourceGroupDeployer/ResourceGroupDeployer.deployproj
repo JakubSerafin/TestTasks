@@ -30,5 +30,14 @@
     </None>
     <Content Include="Deploy-AzureResourceGroup.ps1" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\task2\task2.csproj">
+      <Targets>
+      </Targets>
+      <AdditionalProperties>WebPublishMethod=Package;DeployOnBuild=true;Configuration=Release;PublishProfile=Default;DesktopBuildPackageLocation=..\ResourceGroupDeployer\$(ProjectReferencesOutputPath)\task2\package.zip</AdditionalProperties>
+      <IncludeFilePath>$(ProjectReferencesOutputPath)\task2\package.zip</IncludeFilePath>
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>
