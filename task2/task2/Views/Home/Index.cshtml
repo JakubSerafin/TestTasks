@@ -4,29 +4,31 @@
 }
 @model task2.Models.IndexModel
 
-<div id="cardsPanel">
-    <H3>Data still not loaded form 19115 api, wait few moments</H3>
-    <h4>It is really slow api.</h4>
-    <span class="pseudospinner">This should be spinner</span>
+<div id="cardsPanel" class="d-flex align-items-center flex-column">
+    <H3 class="p-2">Data still not loaded form 19115 api, wait few moments</H3>
+    <h4 class="p-2">It is really slow api.</h4>
+    <span class="pseudospinner p-2">This should be spinner</span>
 </div>
 
 
 
-<script src="~/js/site.min.js" asp-append-version="true"></script>
-<script>
-    var updater = setInterval(function(){
-            $.get("home/GetCards",
-                function (data) {
-                    if (data !== undefined) {
-                        $("#cardsPanel").html(data);
-                        clearInterval(updater);
-                        updater = setInterval(() => $.get("home/GetNewCards?dateTime=" + Date.now(),
-                            function(data) {
-                                $("#cardsPanel").prepend(data);
-                            }),
-                            10000);
-                    }
-                });
-        },
-        5000);
-</script>
+
+@section Scripts {
+    <script>
+        var updater = setInterval(function() {
+                $.get("home/GetCards",
+                    function(data) {
+                        if (data !== undefined) {
+                            $("#cardsPanel").html(data);
+                            clearInterval(updater);
+                            updater = setInterval(() => $.get("home/GetNewCards?dateTime=" + Date.now(),
+                                    function(data) {
+                                        $("#cardsPanel").prepend(data);
+                                    }),
+                                10000);
+                        }
+                    });
+            },
+            5000);
+    </script>
+}

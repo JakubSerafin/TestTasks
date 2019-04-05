@@ -89,14 +89,17 @@
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('farmName'))]"
       ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "tags": {
         "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('farmName')))]": "Resource",
         "displayName": "web app",
         "ServiceOwner": "[parameters('ServiceOwner')]"
-
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('farmName'))]",
+
         "siteConfig": {
           "appSettings": [
             {
@@ -107,7 +110,7 @@
               "name": "ENVIRONMENT_TYPE",
               "value": "[parameters('environment')]"
             }
-            
+
 
           ]
         }
